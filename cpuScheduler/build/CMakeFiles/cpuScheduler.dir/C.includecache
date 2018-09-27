@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/marcoantoniobustamante/Desktop/COMP362/MarcoBustamanteLab05/cpuScheduler/cpuScheduler.c
+cpuScheduler.h
+/home/marcoantoniobustamante/Desktop/COMP362/MarcoBustamanteLab05/cpuScheduler/cpuScheduler.h
+
+/home/marcoantoniobustamante/Desktop/COMP362/MarcoBustamanteLab05/cpuScheduler/cpuScheduler.h
+sys/types.h
+-
+processQueue.h
+/home/marcoantoniobustamante/Desktop/COMP362/MarcoBustamanteLab05/cpuScheduler/processQueue.h
+
+/home/marcoantoniobustamante/Desktop/COMP362/MarcoBustamanteLab05/cpuScheduler/processQueue.c
+processQueue.h
+/home/marcoantoniobustamante/Desktop/COMP362/MarcoBustamanteLab05/cpuScheduler/processQueue.h
+
+/home/marcoantoniobustamante/Desktop/COMP362/MarcoBustamanteLab05/cpuScheduler/processQueue.h
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+stdbool.h
+-
+
