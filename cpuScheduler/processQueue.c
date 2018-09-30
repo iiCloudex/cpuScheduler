@@ -28,7 +28,7 @@ void addProcessToTable(PROCESS process)
     }
     else
     {
-        processTable = realloc(processTable, 2*PROCESS_TABLE_CAPACITY);
+        processTable = (PROCESS *) realloc(processTable, 2*sizeof(processTable));
         processTable[processTableSize] = process;
         processTableSize++;
     }
@@ -36,7 +36,7 @@ void addProcessToTable(PROCESS process)
 
 void displayProcessTable()
 {
-    printf("PROCESSES:\nName    \tEntry\tBurst\n");
+    printf("PROCESSES:\nName\tEntry\tBurst\n");
 
     for(int i = 0; i < processTableSize; i++)
         printf("%s    \t%d\t%d\n", processTable[i].name, processTable[i].entryTime, processTable[i].burstTime);
@@ -49,8 +49,9 @@ void displayProcessTable()
 int findShortestJob()
 {
     int shortest = -1;
-    int min = readyQueue[0]->burstTime;
-    for(int i = 1; i < readyQueueSize; i++)
+    int min = 2000;
+
+    for(int i = 0; i < readyQueueSize; i++)
     {
         if(readyQueue[i]->burstTime < min)
         {
@@ -78,7 +79,7 @@ bool processesLeftToExecute()
 {
     for(int i = 0; i < processTableSize; i++)
     {
-        if(processTable[i].burstTime != 0)
+        if(processTable[i].burstTime > 0)
             return true;
     }
 
@@ -96,7 +97,7 @@ void addProcessToReadyQueue(PROCESS *pointer)
     }
     else
     {
-        readyQueue = realloc(readyQueue, 2*READY_QUEUE_CAPACITY);
+        readyQueue = (PROCESS **) realloc(readyQueue, 2*sizeof(readyQueue));
         readyQueue[readyQueueSize] = pointer;
         readyQueueSize++;
     }
@@ -130,8 +131,8 @@ PROCESS *removeProcessFromReadyQueue(int index)
         removed = readyQueue[index];
         readyQueue[index] = NULL;
 
-        if (index < readyQueueSize-1)
-            memmove(&readyQueue[index], &readyQueue[index+1], ((readyQueueSize-1)-index) * sizeof(readyQueue[0]));
+         if (index < readyQueueSize-1)
+             memmove(&readyQueue[index], &readyQueue[index+1], ((readyQueueSize-1)-index) * sizeof(readyQueue[0]));
 
         readyQueue[readyQueueSize-1] = NULL;
         readyQueueSize--;

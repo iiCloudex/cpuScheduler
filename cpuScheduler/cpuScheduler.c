@@ -39,7 +39,6 @@ int main()
     createProcessTable(PROCESS_TABLE_CAPACITY); //create process table
     createReadyQueue(READY_QUEUE_CAPACITY);//create queue with size == number of processes
 
-    printf("Wuzpoppin\n");
     readProcessTable(); //populate process table
 
     displayProcessTable();
@@ -47,10 +46,8 @@ int main()
     if ((parameters.newProcess = arrivingProcess(time)) != NULL)
         addProcessToReadyQueue(parameters.newProcess);
 
-    printf("Wuzgucci\n");
     while (processesLeftToExecute())
     {
-        printf("Hello\n");
         parameters.time = time;
 
         doStep(parameters.step, &parameters);
@@ -84,18 +81,11 @@ void fcfsStep(void *param)
 {
     ALGORITHM_PARAMS *p = (ALGORITHM_PARAMS *) param;
 
-    if(p->cpu == NULL)
+    if(p->cpu == NULL || p->cpu->burstTime == 0)
     {
         p->cpu = fetchProcessFromReadyQueue(0);
-        p->cpu->waitTime = p->time;
+        p->cpu->waitTime = p->cpu->waitTime - p->cpu->entryTime + p->time - p->cpu->offTime;
     }
-    if(p->cpu->burstTime == 0)
-    {
-        p->cpu = fetchProcessFromReadyQueue(0);
-        p->cpu->waitTime = p->time;
-    }
-
-
 }
 
 // function implementing a step of SJF
@@ -103,9 +93,12 @@ void sjfStep(void *param)
 {
     ALGORITHM_PARAMS *p = (ALGORITHM_PARAMS *) param;
 
+    if(p->cpu == NULL || p->cpu->burstTime ==0)
+    {
+    	p->cpu = fetchProcessFromReadyQueue(findShortestJob());
+    	p->cpu->waitTime = p->time - p->cpu->entryTime;
+    }
 
-
-    // TODO: implement
 }
 
 // function implementing a step of SRTF
@@ -113,7 +106,26 @@ void srtfStep(void *param)
 {
     ALGORITHM_PARAMS *p = (ALGORITHM_PARAMS *) param;
 
-    // TODO: implement
+    if(p->cpu == NULL)
+    {
+    	p->cpu = fetchProcessFromReadyQueue(findShortestJob());
+    	p->cpu->waitTime = p->time - p->cpu->entryTime;
+    }
+    else if(p->cpu->burstTime == 0)
+    {
+    	p->cpu = fetchProcessFromReadyQueue(findShortestJob());
+    	if(p->cpu->offTime > 0)
+    		p->cpu->waitTime += p->time - p->cpu->offTime;
+    	else
+    		p->cpu->waitTime = p->time - p->cpu->entryTime;
+
+    }
+    else if(p->newProcess != NULL && p->newProcess->burstTime < p->cpu->burstTime)
+    {
+    	p->cpu->offTime = p->time;
+    	addProcessToReadyQueue(p->cpu);
+    	p->cpu = fetchProcessFromReadyQueue(findShortestJob());
+    }
 }
 
 // function implementing a step of RR
