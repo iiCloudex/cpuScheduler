@@ -129,6 +129,12 @@ PROCESS *removeProcessFromReadyQueue(int index)
     {
         removed = readyQueue[index];
         readyQueue[index] = NULL;
+
+        if (index < readyQueueSize-1)
+            memmove(&readyQueue[index], &readyQueue[index+1], ((readyQueueSize-1)-index) * sizeof(readyQueue[0]));
+
+        readyQueue[readyQueueSize-1] = NULL;
+        readyQueueSize--;
     }
 
     return removed;
@@ -143,12 +149,11 @@ int getReadyQueueSize()
 // displays the contents of the ready queue
 void displayQueue()
 {
-    // TODO: complete
     printf("\nQUEUE:");
+
     for(int i = 0; i < readyQueueSize; i++)
-    {
         printf(" %s(%d)", readyQueue[i]->name, readyQueue[i]->burstTime);
-    }
+
     printf("\n");
 }
 
