@@ -21,7 +21,7 @@ void createReadyQueue(int capacity)
 // adds a process and expands the table if necessary
 void addProcessToTable(PROCESS process)
 {
-    if(processTableSize < sizeof(processTable))
+    if(processTableSize < sizeof(processTable) - 1)
     {
         processTable[processTableSize] = process;
         processTableSize++;
@@ -49,14 +49,18 @@ void displayProcessTable()
 int findShortestJob()
 {
     int shortest = -1;
-    int min = 2000;
+    int min;
 
-    for(int i = 0; i < readyQueueSize; i++)
+    if(readyQueue[0] != NULL)
     {
-        if(readyQueue[i]->burstTime < min)
+        min = readyQueue[0]->burstTime;
+        for(int i = 1; i < readyQueueSize; i++)
         {
-            min = readyQueue[i]->burstTime;
-            shortest = i;
+            if(readyQueue[i]->burstTime < min)
+            {
+                min = readyQueue[i]->burstTime;
+                shortest = i;
+            }
         }
     }
 
@@ -78,10 +82,9 @@ PROCESS *arrivingProcess(int time)
 bool processesLeftToExecute()
 {
     for(int i = 0; i < processTableSize; i++)
-    {
         if(processTable[i].burstTime > 0)
             return true;
-    }
+    
 
     return false; //return 0 if all processes are complete
 }
@@ -130,10 +133,7 @@ PROCESS *removeProcessFromReadyQueue(int index)
     {
         removed = readyQueue[index];
         readyQueue[index] = NULL;
-
-         if (index < readyQueueSize-1)
-             memmove(&readyQueue[index], &readyQueue[index+1], ((readyQueueSize-1)-index) * sizeof(readyQueue[0]));
-
+        memmove(&readyQueue[index], &readyQueue[index+1], ((readyQueueSize-1)-index) * sizeof(PROCESS *));
         readyQueue[readyQueueSize-1] = NULL;
         readyQueueSize--;
     }
