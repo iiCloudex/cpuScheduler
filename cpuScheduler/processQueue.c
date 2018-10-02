@@ -1,10 +1,18 @@
+/*
+* Name: Marco Antonio Bustamante
+* Lab/Task: Lab 5 / Task 1
+* Date: 9/27/18
+*/
+
 #include "processQueue.h"
 
 PROCESS *processTable; // an array of all processes
 int processTableSize = 0;
+int processTableCapacity = PROCESS_TABLE_CAPACITY;
 
 PROCESS **readyQueue; // an array of pointers to the processes in the processTable
 int readyQueueSize = 0;
+int readyQueueCapacity = READY_QUEUE_CAPACITY;
 
 // constructor of the process table
 void createProcessTable(int capacity)
@@ -21,17 +29,13 @@ void createReadyQueue(int capacity)
 // adds a process and expands the table if necessary
 void addProcessToTable(PROCESS process)
 {
-    if(processTableSize < sizeof(processTable) - 1)
+    if(processTableSize + 1 >= processTableCapacity)
     {
-        processTable[processTableSize] = process;
-        processTableSize++;
+        processTableCapacity *= 2;
+        processTable = (PROCESS *) realloc(processTable, processTableCapacity * sizeof(PROCESS));
     }
-    else
-    {
-        processTable = (PROCESS *) realloc(processTable, 2*sizeof(processTable));
-        processTable[processTableSize] = process;
-        processTableSize++;
-    }
+    processTable[processTableSize] = process;
+    processTableSize++;
 }
 
 void displayProcessTable()
@@ -41,7 +45,6 @@ void displayProcessTable()
     for(int i = 0; i < processTableSize; i++)
         printf("%s    \t%d\t%d\n", processTable[i].name, processTable[i].entryTime, processTable[i].burstTime);
     
-
     printf("\n");
 }
 
@@ -49,18 +52,14 @@ void displayProcessTable()
 int findShortestJob()
 {
     int shortest = -1;
-    int min;
+    int min = 2000;
 
-    if(readyQueue[0] != NULL)
+    for(int i = 0; i < readyQueueSize; i++)
     {
-        min = readyQueue[0]->burstTime;
-        for(int i = 1; i < readyQueueSize; i++)
+        if(readyQueue[i]->burstTime < min)
         {
-            if(readyQueue[i]->burstTime < min)
-            {
-                min = readyQueue[i]->burstTime;
-                shortest = i;
-            }
+            min = readyQueue[i]->burstTime;
+            shortest = i;
         }
     }
 
@@ -84,7 +83,6 @@ bool processesLeftToExecute()
     for(int i = 0; i < processTableSize; i++)
         if(processTable[i].burstTime > 0)
             return true;
-    
 
     return false; //return 0 if all processes are complete
 }
@@ -93,17 +91,14 @@ bool processesLeftToExecute()
 // adds a pointer and expands the ready queue if necessary
 void addProcessToReadyQueue(PROCESS *pointer)
 {
-    if(readyQueueSize < sizeof(readyQueue))
+    if(readyQueueSize + 1 >= readyQueueCapacity)
     {
-        readyQueue[readyQueueSize] = pointer;
-        readyQueueSize++;
+        readyQueueCapacity *= 2;
+        readyQueue = (PROCESS **) realloc(readyQueue, readyQueueCapacity * sizeof(PROCESS *)); 
     }
-    else
-    {
-        readyQueue = (PROCESS **) realloc(readyQueue, 2*sizeof(readyQueue));
-        readyQueue[readyQueueSize] = pointer;
-        readyQueueSize++;
-    }
+    readyQueue[readyQueueSize] = pointer;
+    readyQueueSize++;
+    
 }
 
 // exposes a specific process in the ready queue (it stays in the queue)
@@ -115,10 +110,7 @@ PROCESS *getProcessFromReadyQueue(int index)
 // gets a specific process from the ready queue (it gets removed from the queue)
 PROCESS *fetchProcessFromReadyQueue(int index)
 {
-    PROCESS *proc = readyQueue[index];
-
-    removeProcessFromReadyQueue(index);
-
+    PROCESS *proc = removeProcessFromReadyQueue(index);
     return proc;
 }
 
@@ -133,7 +125,10 @@ PROCESS *removeProcessFromReadyQueue(int index)
     {
         removed = readyQueue[index];
         readyQueue[index] = NULL;
-        memmove(&readyQueue[index], &readyQueue[index+1], ((readyQueueSize-1)-index) * sizeof(PROCESS *));
+
+         if (index < readyQueueSize-1)
+             memmove(&readyQueue[index], &readyQueue[index+1], ((readyQueueSize-1)-index) * sizeof(readyQueue[0]));
+
         readyQueue[readyQueueSize-1] = NULL;
         readyQueueSize--;
     }
@@ -153,7 +148,12 @@ void displayQueue()
     printf("\nQUEUE:");
 
     for(int i = 0; i < readyQueueSize; i++)
-        printf(" %s(%d)", readyQueue[i]->name, readyQueue[i]->burstTime);
+    {
+        if(readyQueueSize == 0)
+            printf(" <empty>\n");
+        else
+            printf(" %s(%d)", readyQueue[i]->name, readyQueue[i]->burstTime);
+    }
 
     printf("\n");
 }
@@ -165,10 +165,8 @@ void printAverageWaitTime()
     float avg = 0;
 
     for(int i = 0; i < processTableSize; i++)
-    {
         avg += processTable[i].waitTime;
-    }
-
+    
     avg = avg/processTableSize;
 
     printf("Average Wait Time: %.2f\n", avg);

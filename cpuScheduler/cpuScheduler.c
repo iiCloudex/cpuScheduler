@@ -1,3 +1,9 @@
+/*
+* Name: Marco Antonio Bustamante
+* Lab/Task: Lab 5 / Task 1
+* Date: 9/27/18
+*/
+
 #include "cpuScheduler.h"
 
 int main()
@@ -84,7 +90,7 @@ void fcfsStep(void *param)
     if(p->cpu == NULL || p->cpu->burstTime == 0)
     {
         p->cpu = fetchProcessFromReadyQueue(0);
-        p->cpu->waitTime = p->cpu->waitTime - p->cpu->entryTime + p->time - p->cpu->offTime;
+        p->cpu->waitTime = p->time - p->cpu->entryTime;
     }
 }
 
@@ -125,6 +131,7 @@ void srtfStep(void *param)
     	p->cpu->offTime = p->time;
     	addProcessToReadyQueue(p->cpu);
     	p->cpu = fetchProcessFromReadyQueue(findShortestJob());
+    	p->cpu->waitTime = p->time - p->cpu->entryTime;
     }
 }
 
@@ -135,7 +142,32 @@ void rrStep(void *param)
 
     static int rrCounter; // counter to keep track of how many more ticks the process in cpu has left
 
-    // TODO: implement
+    if(p->cpu == NULL || p->cpu->burstTime == 0)
+    {
+    	p->cpu = fetchProcessFromReadyQueue(0);
+
+    	if(p->cpu->offTime > 0)
+    		p->cpu->waitTime += p->time - p->cpu->offTime;
+    	else
+    		p->cpu->waitTime = p->time - p->cpu->entryTime;
+
+    	rrCounter = p->quantum;
+    }
+    else if(rrCounter == 0)
+    {
+    	p->cpu->offTime = p->time;
+    	addProcessToReadyQueue(p->cpu);
+
+    	p->cpu = fetchProcessFromReadyQueue(0);
+
+    	if(p->cpu->offTime > 0)
+    		p->cpu->waitTime += p->time - p->cpu->offTime;
+    	else
+    		p->cpu->waitTime = p->time - p->cpu->entryTime;
+    	rrCounter = p->quantum;
+    }
+    rrCounter--;
+    
 }
 
 //fills the processTable with processes from input

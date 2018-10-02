@@ -1,3 +1,9 @@
+/*
+* Name: Marco Antonio Bustamante
+* Lab/Task: Lab 5 / Task 1
+* Date: 9/27/18
+*/
+
 #ifndef _PROCESS_QUEUE_H
 #define _PROCESS_QUEUE_H
 
@@ -9,8 +15,8 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define PROCESS_TABLE_CAPACITY 64
-#define READY_QUEUE_CAPACITY 64
+#define PROCESS_TABLE_CAPACITY 1
+#define READY_QUEUE_CAPACITY 1
 
 typedef struct proc
 {

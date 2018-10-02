@@ -1,3 +1,9 @@
+/*
+* Name: Marco Antonio Bustamante
+* Lab/Task: Lab 5 / Task 1
+* Date: 9/27/18
+*/
+
 #ifndef _CPU_SCHEDULER_H
 #define _CPU_SCHEDULER_H
 
